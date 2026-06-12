@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "웨딩잇 CRM 고객등록 폼의 본식 장소 입력에 VOMS 웨딩홀 목록 자동완성을 제공합니다.",
     "permissions": ["storage", "alarms"],
-    "host_permissions": ["https://voms.test/*"],
+    "host_permissions": ["https://voms-test.dalcode.com/*", "https://voms.test/*"],
     "background": { "service_worker": "background.js" },
     "content_scripts": [
         {

@@ -18,7 +18,7 @@ const showCacheInfo = async () => {
 };
 
 const init = async () => {
-    const { apiUrl = 'https://voms.test', apiKey = '' } = await chrome.storage.sync.get(['apiUrl', 'apiKey']);
+    const { apiUrl = 'https://voms-test.dalcode.com', apiKey = '' } = await chrome.storage.sync.get(['apiUrl', 'apiKey']);
     apiUrlEl.value = apiUrl;
     apiKeyEl.value = apiKey;
     await showCacheInfo();
