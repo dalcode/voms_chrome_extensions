@@ -1,1 +1,31 @@
-<!DOCTYPE html><html><body></body></html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>VOMS 웨딩홀 자동완성 설정</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; font-size: 13px; width: 420px; padding: 16px; }
+        label { display: block; margin: 12px 0 4px; font-weight: bold; }
+        input { width: 100%; box-sizing: border-box; padding: 6px; }
+        button { margin-top: 16px; margin-right: 8px; padding: 6px 14px; }
+        #status { margin-top: 12px; color: #333; }
+        #status.error { color: #c00; }
+    </style>
+</head>
+<body>
+    <h2>VOMS 웨딩홀 자동완성 설정</h2>
+
+    <label for="apiUrl">VOMS API URL</label>
+    <input type="text" id="apiUrl" placeholder="https://voms.test">
+
+    <label for="apiKey">API 키</label>
+    <input type="password" id="apiKey" placeholder="HALL_API_KEY 값">
+
+    <button id="save">저장</button>
+    <button id="refresh">목록 갱신</button>
+
+    <div id="status"></div>
+
+    <script src="options.js"></script>
+</body>
+</html>
