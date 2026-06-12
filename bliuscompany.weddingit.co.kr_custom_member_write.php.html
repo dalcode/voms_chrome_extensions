@@ -1,0 +1,497 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>고객등록</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=euc-kr">
+	<meta http-equiv="Cache-Control" content="no-cache">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Expires" content="0">
+	<meta name="robots" content="noindex">
+	<link href="/ws_lib/css2/default.css?1781261461" rel="stylesheet" type="text/css">
+	<link href="/ws_lib/css2/layout.css?1781261461" rel="stylesheet" type="text/css">
+	<link href="/ws_lib/css2/board.css?1781261461" rel="stylesheet" type="text/css">
+	<link href="/ws_lib/css2/btn.css?1781261461" rel="stylesheet" type="text/css">
+	<link href="/_library/css2/common.css?1781261461" rel="stylesheet" type="text/css">
+	<link href="/ws_lib/css2/jquery-ui.css?1781261461" rel="stylesheet" type="text/css">
+	<script type="text/javascript" src="/ws_lib/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/ws_lib/js/jquery-ui.min.js"></script>
+	<script type="text/JavaScript">jQuery.noConflict();</script>
+	<script type="text/javascript" src="/ws_lib/js/global_func.js"></script>
+	<script type="text/javascript" src="/ws_lib/js/global_func_form.js"></script>
+	<script type="text/javascript" src="/ws_lib/js/mini_calendar.js"></script>
+	<script type="text/javascript" src="/_library/js/site_func.js"></script>
+	<script type="text/javascript" src="/_library/js/global_func_cbox.js"></script>
+	<script type="text/javascript" src="/ws_lib/js/light_box_dev.js"></script>
+	<script type="text/javascript" src="/ws_lib/js/debug.js"></script>
+	<script type="text/javascript">
+		function chkForm() {
+			var form = document.myForm;
+
+			if (form.wm_mname.value == "" && form.wm_wname.value == "") {
+				alert("신랑/신부 중 한명의 고객명은 입력하셔야 됩니다!");
+				form.wm_mname.focus();
+				return;
+			}
+
+			if (!InputCheck("myForm", "wm_order_date", "발주일", "S", "", "", "", "Y")) { return; }
+
+			if (form.wm_mcode.length > 1) {
+				for (var inx = 0; inx < form.wm_mcode.length; inx++) {
+					if (form.wm_mcode[0].checked) {
+						if (!form.chk_company_name.value) {
+							alert('업체를 찾아주세요');
+							form.chk_company_name.focus();
+							return;
+						}
+					}
+				}
+			}
+
+			var cnt = false;
+			var obj = form['chk_gcode[]'];
+			for (var i = 0; i < obj.length; i++) {
+				if (obj[i].checked) {
+					cnt = true;
+				}
+			}
+			if (!cnt) {
+				alert("촬영상품 구분 체크하세요!");
+				return false;
+			}
+			form.submit();
+		}
+
+		// 업체고객 상품선택
+		function setGoods(idx) {
+			jQuery.ajax({
+				type: 'POST',
+				asyn: true,
+				url: 'member_xml.php',
+				data: 'wc_idx=' + idx,
+				dataType: 'html',
+				success: function (html) {
+					jQuery('#goods').html(html);
+				}
+			});
+		}
+
+		function popClose() {
+			if (confirm('고객 등록을 취소 하시겠습니까?')) {
+				self.close();
+			}
+		}
+
+		function setPlanner(ev) {
+			var wc_idx = document.myForm.wc_idx.value;
+			if (!wc_idx) {
+				alert('업체를 찾아주세요');
+				return false;
+			}
+			parent.SLB_show('/common/wed_planner.php?act=reg&wc_idx=' + wc_idx, 'iframe', 500, 400, true, true);
+		}
+
+		function setMcode(st) {
+			if (st == "132") {
+				jQuery('#trCom').css('display', 'none');
+			} else {
+				jQuery('#trCom').css('display', '');
+			}
+		}
+
+		jQuery(document).ready(function () {
+			// 업체 구분에 따른 입력모드 변경
+			jQuery("input:radio[name='wm_mcode']").click(function () {
+				setMcode(this.value);
+			});
+			setMcode('131');
+		});
+	</script>
+<body id="none">
+
+	<div id="page-navi_pop">
+		고객관리 <img src="/ws_lib/img/blet/navi_arrow.gif" /> <span>고객등록</span>
+		<span style="float:right;margin-right:10px"><img src="/ws_lib/img/btn/pop_close.gif" onclick="popClose();" class="hand" /></span>
+	</div>
+	<div id="popup">
+		<form name="myForm" method="post" action="./member_proc.php">
+			<input type="hidden" name="act" value="reg" />
+			<input type="hidden" name="wm_idx" value="" />
+			<input type="hidden" name="prev_wc_idx" value="" />
+			<input type="hidden" name="prev_wm_mcode" value="131" />
+			<table class="table-write" style="margin:0 auto;">
+				<colgroup>
+					<col style="width:12%" />
+					<col style="width:38%" />
+					<col style="width:12%" />
+					<col style="width:38%" />
+				</colgroup>
+				<tr>
+					<td colspan="4" class="title">기본정보<span class="item"><img src="/ws_lib/img/css/chk.gif" /> 항목은 필수 항목 입니다</span></td>
+				</tr>
+				<tr>
+					<th class="chk"> 발주(계약)일</td>
+					<td>
+						<input type="text" id="wm_order_date" name="wm_order_date" class="forms" value="2026-06-12" readonly="readonly" onClick="miniSetCalendar(event,'wm_order_date');" style="width:70px" /> <img src="/ws_lib/img/btn/calendar.png" onClick="miniSetCalendar(event,'wm_order_date');" class="hand" />
+					</td>
+					<th>예약문자</th>
+					<td>
+						<label><input type="checkbox" name="wm_sms_nosend" value="Y" /> 미발송</label>
+						<span>(※ 체크할 경우 예약문자를 발송하지 않습니다)</span>
+					</td>
+				</tr>
+				<tr>
+					<th class="chk" style="background-color:#f8f1fe;">고객구분</th>
+					<td><label><input type="radio" name="wm_mcode" value="131" checked> 업체고객 </label>&nbsp;<label><input type="radio" name="wm_mcode" value="132"> 워킹고객 </label>&nbsp;</td>
+					<th class="chk">발주여부</th>
+					<td><label><input type="radio" name="wm_order" value="111" checked> <span style="color:red;font-weight:bold;">가계약</span> </label>&nbsp;<label><input type="radio" name="wm_order" value="112"> <span style="color:blue">확정</span> </label>&nbsp;</td>
+				</tr>
+				<tr id="trCom" style="display:'';">
+					<th class="chk" style="background-color:#f8f1fe;">업체명</th>
+					<td colspan="3">
+						<input type="hidden" name="wc_idx" value="" />
+						<input type="text" id="chk_company_name" name="chk_company_name" class="forms" readonly="readonly" onClick="parent.SLB_show('/common/com_search.php?act=reg','iframe', 500, 400, true,true);" style="width:150px;" value="" />
+						<a href="#none" onClick="parent.SLB_show('/common/com_search.php?act=reg','iframe', 500, 400, true,true);return false;" class="btnCtrl"><span>검색</span></a>&nbsp;&nbsp;
+						<input type="hidden" name="wp_idx" value="" />
+						* 업체담당자 : <input type="text" name="wm_wc_name" class="forms" style="width:100px;" value="" readonly />
+						<a href="#none" onClick="setPlanner();return false;" class="btnCtrl"><span>담당자선택</span></a>&nbsp;&nbsp;
+						* 담당자연락처 : <input type="text" name="wm_wc_tel" class="forms" style="width:100px;" value="" />
+					</td>
+				</tr>
+				<tr>
+					<th class="chk">신랑명</th>
+					<td><input type="text" name="wm_mname" maxlength="20" class="forms" style="width:100px;" value="" /></td>
+					<th class="chk">신부명</th>
+					<td><input type="text" name="wm_wname" maxlength="20" class="forms" style="width:100px;" value="" /></td>
+				</tr>
+				<tr>
+					<th>신랑휴대폰</th>
+					<td>
+						<select name="chk_mhp1">
+
+							<option value="010">010</option>
+						</select> -
+						<input type="text" name="chk_mhp2" maxlength="4" class="forms" style="width:40px" value="" onKeyUp="Fn_tel2Press('myForm','chk_mhp2','chk_mhp3');" /> -
+						<input type="text" name="chk_mhp3" maxlength="4" class="forms" style="width:40px" value="" />
+						<span>(모두 입력되어야 정상입력 됩니다)</span>
+					</td>
+					<th>신부휴대폰</th>
+					<td>
+						<select name="chk_whp1">
+
+							<option value="010">010</option>
+						</select> -
+						<input type="text" name="chk_whp2" maxlength="4" class="forms" style="width:40px" value="" onKeyUp="Fn_tel2Press('myForm','chk_whp2','chk_whp3');" /> -
+						<input type="text" name="chk_whp3" maxlength="4" class="forms" style="width:40px" value="" />
+						<span>(모두 입력되어야 정상입력 됩니다)</span>
+					</td>
+				</tr>
+				<tr>
+					<th>신랑메일</th>
+					<td>
+						<input type="text" name="chk_memail1" class="forms" style="width:80px;ime-mode:inactive;" value="" /> @
+						<input type="text" name="chk_memail2" class="forms" style="width:100px;ime-mode:inactive;" value="" />
+						<select name="chk_gubun1" onchange="myForm.chk_memail2.value=this.value">
+							<option value="">직접입력</option>
+							<option value="naver.com">naver.com</option>
+							<option value="nate.com">nate.com</option>
+							<option value="gmail.com">gmail.com</option>
+							<option value="hanmail.net">hanmail.net</option>
+							<option value="daum.net">daum.net</option>
+						</select>
+					</td>
+					<th>신부메일</th>
+					<td>
+						<input type="text" name="chk_wemail1" class="forms" style="width:80px;ime-mode:inactive;" value="" /> @
+						<input type="text" name="chk_wemail2" class="forms" style="width:100px;ime-mode:inactive;" value="" />
+						<select name="chk_gubun2" onchange="myForm.chk_wemail2.value=this.value">
+							<option value="">직접입력</option>
+							<option value="naver.com">naver.com</option>
+							<option value="nate.com">nate.com</option>
+							<option value="gmail.com">gmail.com</option>
+							<option value="hanmail.net">hanmail.net</option>
+							<option value="daum.net">daum.net</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th>주소</th>
+					<td colspan="3">
+						<input type="text" name="chk_zip" class="forms" readonly="readonly" onClick="execPostCode();" style="width:50px" value="" />
+						<a href="#none" onClick="execPostCode();return false;" class="btnCtrl"><span>찾기</span></a>
+						<input type="text" name="chk_addr1" class="forms" style="width:350px" value="" />
+						<input type="text" name="chk_addr2" class="forms" style="width:200px" value="" />
+					</td>
+				</tr>
+				<tr>
+					<th>촬영상품구분</th>
+					<td>
+						<label><input type="checkbox" name="chk_gcode[]" value="1051"> <span style="color:blue">영상</span> </label>&nbsp;<label><input type="checkbox" name="chk_gcode[]" value="1052"> <span style="color:#cc00ff">리허설</span> </label>&nbsp;<label><input type="checkbox" name="chk_gcode[]" value="1054"> 아이폰스냅 </label>&nbsp;
+					</td>
+					<th>브랜드</th>
+					<td>
+						<select name="wm_brand">
+							<option value="">브랜드</option>
+							<option value="1061"><span style="color:black">트윈블라썸</span></option>
+							<option value="1062"><span style="color:black">바이모먼트</span></option>
+							<option value="1063"><span style="color:black">이브닝글로우</span></option>
+							<option value="1064"><span style="color:black">라이트댓필름</span></option>
+							<option value="1065"><span style="color:black">블루머</span></option>
+							<option value="1066">리엘로</option>
+							<option value="1067">클라로</option>
+							<option value="1068">라이트댓아이폰</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="4" class="title">본식정보</td>
+				</tr>
+				<tr>
+					<th>본식 촬영</th>
+					<td>
+						<input type="text" id="wm_wed_date" name="wm_wed_date" class="forms" readonly="readonly" value="" onClick="miniSetCalendar(event,'wm_wed_date');" style="width:70px" />
+						<img src="/ws_lib/img/btn/calendar.png" onClick="miniSetCalendar(event,'wm_wed_date');" class="hand" />
+						<select name="chk_wed_time" style="width:50">
+							<option value="0">0</option>
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6">6</option>
+							<option value="7">7</option>
+							<option value="8">8</option>
+							<option value="9">9</option>
+							<option value="10">10</option>
+							<option value="11">11</option>
+							<option value="12">12</option>
+							<option value="13">13</option>
+							<option value="14">14</option>
+							<option value="15">15</option>
+							<option value="16">16</option>
+							<option value="17">17</option>
+							<option value="18">18</option>
+							<option value="19">19</option>
+							<option value="20">20</option>
+							<option value="21">21</option>
+							<option value="22">22</option>
+							<option value="23">23</option>
+						</select> 시
+						<select name="chk_wed_min" style="width:50">
+							<option value="0">0</option>
+							<option value="5">5</option>
+							<option value="10">10</option>
+							<option value="15">15</option>
+							<option value="20">20</option>
+							<option value="25">25</option>
+							<option value="30">30</option>
+							<option value="35">35</option>
+							<option value="40">40</option>
+							<option value="45">45</option>
+							<option value="50">50</option>
+							<option value="55">55</option>
+						</select> 분
+						<a href="#none" onClick="setDelDate('wm_wed_date','chk_wed_time','chk_wed_min');return false;" class="btnCtrl"><span>초기화</span></a><br>
+					</td>
+					<th>촬영자1</th>
+					<td>
+						<select name="wm_wed_photo" style="width:170px;">
+							<option value="">▼ 촬영자 선택</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th>본식 장소</th>
+					<td>
+						<input type="text" id="wm_wed_place" name="wm_wed_place" maxlength="50" class="forms" style="width:150px;" value="" />
+						<!--img src="/ws_lib/img/btn/btn_place.gif" onClick="setiFrame(event,'myForm','wm_wed_place','/common/wed_place.php?w=833','205','155',-80,-50);" class="hand" /-->
+					</td>
+					<th>촬영자2</th>
+					<td>
+						<select name="wm_wed_step" style="width:170px;">
+							<option value="">▼ 촬영자 선택</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<th> 메이크업샵</td>
+					<td colspan="3">
+						<input type="text" id="wm_makeup_place" name="wm_makeup_place" maxlength="50" class="forms" style="width:150px;" value="" />&nbsp;
+						<select name="chk_makeup_time" style="width:50">
+							<option value="0">0</option>
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6">6</option>
+							<option value="7">7</option>
+							<option value="8">8</option>
+							<option value="9">9</option>
+							<option value="10">10</option>
+							<option value="11">11</option>
+							<option value="12">12</option>
+							<option value="13">13</option>
+							<option value="14">14</option>
+							<option value="15">15</option>
+							<option value="16">16</option>
+							<option value="17">17</option>
+							<option value="18">18</option>
+							<option value="19">19</option>
+							<option value="20">20</option>
+							<option value="21">21</option>
+							<option value="22">22</option>
+							<option value="23">23</option>
+						</select> 시
+						<select name="chk_makeup_min" style="width:50">
+							<option value="0">0</option>
+							<option value="5">5</option>
+							<option value="10">10</option>
+							<option value="15">15</option>
+							<option value="20">20</option>
+							<option value="25">25</option>
+							<option value="30">30</option>
+							<option value="35">35</option>
+							<option value="40">40</option>
+							<option value="45">45</option>
+							<option value="50">50</option>
+							<option value="55">55</option>
+						</select> 분
+						<a href="#none" onClick="setDelDate('','chk_makeup_time','chk_makeup_min');return false;" class="btnCtrl"><span>초기화</span></a>
+					</td>
+				</tr>
+				<tr>
+					<th>본식 비고</td>
+					<td class="cont" colspan="3"><textarea name="wm_wed_etc" class="forms" style="width:80%;height:30px;"></textarea></td>
+				</tr>
+			</table>
+		</form>
+
+		<div id="table_btn" class="btn_box" style="margin:0 auto;padding-top:10px;">
+			<div class="left">&nbsp;</div>
+			<div class="right">
+				<a href="#" class="btnBlueL" onclick="chkForm()">등록</a>
+				<a href="#" class="btnBlueL" onclick="setReset(document.myForm);">취소</a>
+			</div>
+		</div>
+	</div>
+	<div id="zipLayer" style="display:none;position:fixed;overflow:hidden;z-index:1;-webkit-overflow-scrolling:touch;">
+		<img src="//i1.daumcdn.net/localimg/localimages/07/postcode/320/close.png" id="btnCloseLayer" style="cursor:pointer;position:absolute;right:-3px;top:-3px;z-index:1" onclick="closeDaumPostcode()" alt="닫기 버튼">
+	</div>
+	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+	<script>
+		// 우편번호 찾기 화면을 넣을 element
+		var eleZipLayer = document.getElementById('zipLayer');
+
+		function closeDaumPostcode() {
+			// iframe을 넣은 element를 안보이게 한다.
+			eleZipLayer.style.display = 'none';
+		}
+
+		function execPostCode() {
+			new daum.Postcode({
+				oncomplete: function (data) {
+					// 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+					// 각 주소의 노출 규칙에 따라 주소를 조합한다.
+					// 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+					var fullAddr = data.address; // 최종 주소 변수
+					var extraAddr = ''; // 조합형 주소 변수
+
+					// 기본 주소가 도로명 타입일때 조합한다.
+					if (data.addressType === 'R') {
+						//법정동명이 있을 경우 추가한다.
+						if (data.bname !== '') {
+							extraAddr += data.bname;
+						}
+						// 건물명이 있을 경우 추가한다.
+						if (data.buildingName !== '') {
+							extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+						}
+						// 조합형주소의 유무에 따라 양쪽에 괄호를 추가하여 최종 주소를 만든다.
+						fullAddr += (extraAddr !== '' ? ' (' + extraAddr + ')' : '');
+					}
+
+					// 우편번호와 주소 정보를 해당 필드에 넣는다.
+					document.myForm.chk_zip.value = data.zonecode;
+					document.myForm.chk_addr1.value = fullAddr;
+					document.myForm.chk_addr2.focus();
+
+					// iframe을 넣은 element를 안보이게 한다.
+					// (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
+					eleZipLayer.style.display = 'none';
+					eleZipLayer.style.zIndex = 0;
+				},
+				width: '100%',
+				height: '100%'
+			}).embed(eleZipLayer);
+
+			// iframe을 넣은 element를 보이게 한다.
+			eleZipLayer.style.display = 'block';
+
+			// iframe을 넣은 element의 위치를 화면의 가운데로 이동시킨다.
+			initLayerPosition();
+		}
+		function execPostCode2() {
+			new daum.Postcode({
+				oncomplete: function (data) {
+					// 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+					// 각 주소의 노출 규칙에 따라 주소를 조합한다.
+					// 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+					var fullAddr = data.address; // 최종 주소 변수
+					var extraAddr = ''; // 조합형 주소 변수
+
+					// 기본 주소가 도로명 타입일때 조합한다.
+					if (data.addressType === 'R') {
+						//법정동명이 있을 경우 추가한다.
+						if (data.bname !== '') {
+							extraAddr += data.bname;
+						}
+						// 건물명이 있을 경우 추가한다.
+						if (data.buildingName !== '') {
+							extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+						}
+						// 조합형주소의 유무에 따라 양쪽에 괄호를 추가하여 최종 주소를 만든다.
+						fullAddr += (extraAddr !== '' ? ' (' + extraAddr + ')' : '');
+					}
+
+					// 우편번호와 주소 정보를 해당 필드에 넣는다.
+					document.myForm.chk2_zip.value = data.zonecode;
+					document.myForm.chk2_addr1.value = fullAddr;
+					document.myForm.chk2_addr2.focus();
+
+					// iframe을 넣은 element를 안보이게 한다.
+					// (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
+					eleZipLayer.style.display = 'none';
+					eleZipLayer.style.zIndex = 0;
+				},
+				width: '100%',
+				height: '100%'
+			}).embed(eleZipLayer);
+
+			// iframe을 넣은 element를 보이게 한다.
+			eleZipLayer.style.display = 'block';
+
+			// iframe을 넣은 element의 위치를 화면의 가운데로 이동시킨다.
+			initLayerPosition();
+		}
+		// 브라우저의 크기 변경에 따라 레이어를 가운데로 이동시키고자 하실때에는
+		// resize이벤트나, orientationchange이벤트를 이용하여 값이 변경될때마다 아래 함수를 실행 시켜 주시거나,
+		// 직접 eleZipLayer의 top,left값을 수정해 주시면 됩니다.
+		function initLayerPosition() {
+			var width = 550;			//우편번호서비스가 들어갈 element의 width
+			var height = 300;			//우편번호서비스가 들어갈 element의 height
+			var borderWidth = 5;	//샘플에서 사용하는 border의 두께
+			eleZipLayer.style.zIndex = 10;
+
+			// 위에서 선언한 값들을 실제 element에 넣는다.
+			eleZipLayer.style.width = width + 'px';
+			eleZipLayer.style.height = height + 'px';
+			eleZipLayer.style.border = borderWidth + 'px solid';
+			// 실행되는 순간의 화면 너비와 높이 값을 가져와서 중앙에 뜰 수 있도록 위치를 계산한다.
+			eleZipLayer.style.left = (((window.innerWidth || document.documentElement.clientWidth) - width) / 2 - borderWidth) + 'px';
+			eleZipLayer.style.top = (((window.innerHeight || document.documentElement.clientHeight) - height) / 2 - borderWidth) + 'px';
+		}
+	</script>
+</body>
+</html>
